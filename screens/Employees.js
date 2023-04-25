@@ -49,17 +49,70 @@ let skills = [
 
 ]
 
+let weekdayIds = {
+  "Monday": 1,
+  "Tuesday": 2,
+  "Wednesday": 3,
+  "Thursday": 4,
+  "Friday": 5,
+  "Saturday": 6,
+  "Sunday": 7,
+}
+
+let skillsIds = {
+  "C#": 101,
+  "Javascript": 102,
+  "C#": 101,
+  "Python":103,
+  "Lua":104,
+  "Java":105,
+  "HTML":106,
+  "CSS":107,
+  "SQL":108,
+  "Camera Work":201,
+  "Editting":202,
+  "SFX":203,
+  "Video Scripting":204,
+}
+
 export default function Employees({navigation}) {
   const [editState, setEditState] = useState(false);
-  const [editKey, setEditKey] = useState("1");
+  const [editKey, setEditKey] = useState(-1);
   const [selectedDays, setSelectedDays] = useState([]);
   const [selectedSkills, setSelectedSkills] = useState([]);
   const [phoneText, setPhoneText] = useState("");
   const [emailText, setEmailText] = useState("");
   const [nameText, setNameText] = useState("");
   const [employeeArray, setEmployeeArray] = useState();
+  
 
   const editEmployee = (ekey) =>{
+    db.transaction((tx)=>{
+      tx.executeSql("select * from employees where id = ?;", [ekey], (tx,res)=>{
+        if (res.rows.length > 0){
+          setNameText(res.rows._array[0]["name"]);
+          setPhoneText(res.rows._array[0]["phone"]);
+          setEmailText(res.rows._array[0]["email"]);
+
+
+          let split1 = res.rows._array[0]["avail"].split("|");
+          let availTbl = []
+          for (let i=0; i<split1.length; i++){
+            console.log(split1[i])
+            availTbl.push( weekdayIds[split1[i]] );
+          }
+          setSelectedDays(availTbl);
+
+          let split2 = res.rows._array[0]["skills"].split("|");
+          let skillTbl = [];
+          for (let i=0; i<split2.length; i++){
+            skillTbl.push( skillsIds[split2[i]] );
+          }
+          setSelectedSkills(skillTbl);
+
+        }
+      })
+    });
     setEditKey(ekey);
     setEditState(true);
   }
@@ -67,21 +120,49 @@ export default function Employees({navigation}) {
   const updateEmployeeArray = async () => {
     db.transaction((tx)=>{
       tx.executeSql("select * from employees", [], (tx, res)=>{
-        console.error(res)
         setEmployeeArray( res.rows );
       });
     });
   }
 
-  const getEmployeeSkills = (id) => {
-    console.log("finding")
+  const getArrayStr = (arr) =>{
+    let nstr = ""
+    arr.map((part)=>{
+      nstr+=part+"|";
+    })
+    nstr.substring(0,nstr.length-1)
+    return nstr;
+  }
 
-    db.transaction((tx) =>{
-      tx.executeSql("insert into skills (id, skill) values (1, 'testskill')");
-      tx.executeSql("select * from skills where id = ?;", [1], (tx, res)=>{
-        console.log(res.rows)
-      })
-    });
+  const saveEmployee = (ekey) => {
+    if (ekey != -1){
+      setEditState(false);
+      db.transaction((tx)=>{
+        
+        console.log("removing og.. "+ editKey.toString())
+        tx.executeSql("delete from employees where id=", [editKey]);
+        tx.executeSql("insert into employees (name, phone, email, avail, skills) values (?, ?, ?, ?, ?)", [nameText, phoneText, emailText, getArrayStr(selectedDays), getArrayStr(selectedSkills)])
+        
+      });
+      setEditKey(-1);
+    }else{
+      setEditKey(-1);
+        setEditState(false);
+      db.transaction((tx)=>{
+        
+        tx.executeSql("insert into employees (name, phone, email, avail, skills) values (?, ?, ?, ?, ?)", [nameText, phoneText, emailText, getArrayStr(selectedDays), getArrayStr(selectedSkills)])
+      });
+    }
+  }
+
+  const addEmployee = () => {
+    setNameText("");
+    setEmailText("");
+    setPhoneText("");
+    setSelectedSkills([]);
+    setSelectedDays([]);
+    setEditKey(-1)
+    setEditState(true);
   }
   
   const verifyInputs = () => {
@@ -102,15 +183,23 @@ export default function Employees({navigation}) {
     }
   }
 
-  const updateEmployee = () => {
-    verifyInputs();
+  const updateEmployee = (ekey) => {
+    
+      if (ekey != "-1"){
+        editEmployee(ekey)
+      }else{
+        addEmployee();
+      }
+    
   }
 
   function EmployeeButton(props) {
     if (props.ename && props.ekey){
+            
+
       return(
         <View id={props.ekey} style={styles.ebox}>
-          <TouchableOpacity style={{flex:8}} onPress={() => editEmployee(props.ekey)}>
+          <TouchableOpacity style={{flex:8}} onPress={() => {editEmployee(props.ekey)}}>
             <Text style={{fontSize:25, textAlign:'center'}}>{props.ename}</Text>
           </TouchableOpacity>
           
@@ -129,10 +218,7 @@ export default function Employees({navigation}) {
     updateEmployeeArray();
 
     db.transaction((tx) =>{
-      tx.executeSql("drop table employees");
-      tx.executeSql("drop table skills");
-      tx.executeSql("create table if not exists employees (id integer primary key not null, name text, phone text, email text, avail text);")
-      tx.executeSql("create table if not exists skills (id integer not null, skill text);")
+      tx.executeSql("create table if not exists employees (id integer primary key not null, name text, phone text, email text, avail text, skills text);")
     });
     updateEmployeeArray();
   }
@@ -147,23 +233,29 @@ export default function Employees({navigation}) {
       <SafeAreaView style={styles.container}>
         
         
-        <Pressable>
-          <Ionicons name="add-circle" size={statHeight+50} color={'green'} style={styles.addButton} onPress={()=>{getEmployeeSkills(1)}}></Ionicons>
-        </Pressable>
+        <TouchableOpacity>
+          <Ionicons name="add-circle" size={statHeight+50} color={'green'} style={styles.addButton} onPress={()=>{updateEmployee(-1)}}></Ionicons>
+        </TouchableOpacity>
         <ScrollView>
         <EmployeeButton ename="jake" ekey="1"></EmployeeButton>
         <EmployeeButton ename="alex" ekey="2"></EmployeeButton>
 
         {employeeArray && employeeArray["_array"]?
-          employeeArray["_array"].map(a =>{
-            <EmployeeButton ename={a["name"]} ekey={a["id"]}> </EmployeeButton>
-          })
+        employeeArray["_array"].map(a=>{
+          const name = a["name"];
+          const id = a["id"]
+          return (
+          <EmployeeButton key={a["id"]} ename={a["name"]} ekey={a["id"].toString()} ></EmployeeButton>
+          )
+        })
+        
+          
         :null
         }
 
-        <Pressable onPress={()=>navigation.navigate("Search")}>
+        <TouchableOpacity onPress={()=>navigation.navigate("Search")}>
           <Text style={styles.findButton}>Find Employees</Text>
-        </Pressable>
+        </TouchableOpacity>
 
         </ScrollView>  
       </SafeAreaView>
@@ -174,31 +266,31 @@ export default function Employees({navigation}) {
       <ScrollView style={styles.container2}>
         <View style={styles.inputArea}>
           <Text style={styles.inputLabel}>Name</Text>
-          <TextInput style={styles.textInput} onChangeText={(nt)=>setNameText(nt)}></TextInput>
+          <TextInput style={styles.textInput} onChangeText={(nt)=>setNameText(nt)}>{nameText}</TextInput>
         </View>
 
         <View style={styles.inputArea}>
           <Text style={styles.inputLabel}>Phone</Text>
-          <TextInput style={styles.textInput} onChangeText={(nt)=>setPhoneText(nt)}></TextInput>
+          <TextInput style={styles.textInput} onChangeText={(nt)=>setPhoneText(nt)}>{phoneText}</TextInput>
         </View>
 
         <View style={styles.inputArea}>
           <Text style={styles.inputLabel}>Email</Text>
-          <TextInput style={styles.textInput} onChangeText={(nt)=>setEmailText(nt)}></TextInput>
+          <TextInput style={styles.textInput} onChangeText={(nt)=>setEmailText(nt)}>{emailText}</TextInput>
         </View>
 
         <Text style={styles.inputLabel}>Skills</Text>
-        <SectionedMultiSelect readOnlyHeadings={true} selectText={"Select Skills"} IconRenderer={Icon} items={skills} uniqueKey="id" subKey="children" onSelectedItemsChange={(d)=>{setSelectedSkills(d)}} selectedItems={selectedSkills} ></SectionedMultiSelect>
-
+        <SectionedMultiSelect readOnlyHeadings={true} selectText={"Select Skills"} IconRenderer={Icon} items={skills} uniqueKey="id" subKey="children" onSelectedItemsChange={(d)=>{setSelectedSkills(d); console.log(selectedSkills)} } selectedItems={selectedSkills} ></SectionedMultiSelect>
+        
         <Text style={styles.inputLabel}>Availability</Text>
         <SectionedMultiSelect readOnlyHeadings={true} selectText={"Select Availability"} IconRenderer={Icon} items={weekdays} uniqueKey="id" subKey="children" onSelectedItemsChange={(d)=>{setSelectedDays(d)}} selectedItems={selectedDays} ></SectionedMultiSelect>
 
-        <Pressable onPress={() =>{updateEmployee()}}>
+        <TouchableOpacity onPress={() =>{saveEmployee(editKey)}}>
           <Ionicons name='checkmark-circle' color={'green'} size={50} style={{alignSelf:'center'}}></Ionicons>
-        </Pressable>
-        <Pressable onPress={() =>setEditState(false)}>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() =>setEditState(false)}>
           <Ionicons name='close-circle' color={'red'} size={50} style={{alignSelf:'center'}}></Ionicons>
-        </Pressable>
+        </TouchableOpacity>
       </ScrollView>
     );
   }
