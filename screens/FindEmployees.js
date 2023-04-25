@@ -77,7 +77,6 @@ export default function FindEmployees() {
       backgroundColor: 'limegreen',
       padding: 8,
       borderRadius: 50,
-      height: 50,
       textAlignVertical: 'center',
       fontWeight: 'bold',
       width: '50%',

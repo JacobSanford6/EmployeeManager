@@ -227,7 +227,6 @@ export default function Employees({navigation}) {
       textAlign: 'center',
       backgroundColor: 'limegreen',
       padding: 8,
-      height: 50,
       borderRadius: 50,
       fontWeight: 'bold',
       width: '50%',
