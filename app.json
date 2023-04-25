@@ -4,10 +4,10 @@
     "slug": "EmployeeManager",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/employeeIcon.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/employeeIcon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },

@@ -7,7 +7,10 @@ import FindEmployees from './screens/FindEmployees';
 import EmployeeInfo from './screens/EmployeeInfo';
 import EmployeeContact from './screens/EmployeeContact';
 import Ionicons from '@expo/vector-icons/Ionicons'
+import * as SplashScreen from 'expo-splash-screen';
 
+SplashScreen.preventAutoHideAsync();
+setTimeout(SplashScreen.hideAsync, 2000);
 
 export { Employees }
 
@@ -26,8 +29,7 @@ export default function App({navigation}) {
   return (
     <NavigationContainer>
       <Tab.Navigator
-      
-      
+
       
       screenOptions={({route}) =>({
         tabBarShowLabel:false,
@@ -47,18 +49,10 @@ export default function App({navigation}) {
           return <Ionicons name={iconName} size={size}></Ionicons>
         },
 
-        tabBarStyle:{padding:10, height:70}
-        
-        
-        
-
+        tabBarStyle:{padding:10, height:70},
       })}
 
 
-      tabBarOptions={{
-        labelStyle: { paddingBottom:10, fontSize: 15},
-        
-      }}
       
 
       >
