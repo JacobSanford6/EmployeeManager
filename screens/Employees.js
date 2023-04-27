@@ -95,20 +95,9 @@ export default function Employees({navigation}) {
           setEmailText(res.rows._array[0]["email"]);
 
 
-          let split1 = res.rows._array[0]["avail"].split("|");
-          let availTbl = []
-          for (let i=0; i<split1.length; i++){
-            console.log(split1[i])
-            availTbl.push( weekdayIds[split1[i]] );
-          }
-          setSelectedDays(availTbl);
-
-          let split2 = res.rows._array[0]["skills"].split("|");
-          let skillTbl = [];
-          for (let i=0; i<split2.length; i++){
-            skillTbl.push( skillsIds[split2[i]] );
-          }
-          setSelectedSkills(skillTbl);
+          
+          setSelectedDays(getStrArray(res.rows._array[0]["avail"]));
+          setSelectedSkills(getStrArray(res.rows._array[0]["skills"]));
 
         }
       })
@@ -134,24 +123,38 @@ export default function Employees({navigation}) {
     return nstr;
   }
 
+  const getStrArray = (str) => {
+    let narr = [];
+    const split = str.split("|");
+    for (subs of split){
+      if (subs.trim() != ""){
+        narr.push( parseInt(subs));
+      }
+    }
+    return narr;
+  }
+
   const saveEmployee = (ekey) => {
     if (ekey != -1){
-      setEditState(false);
-      db.transaction((tx)=>{
-        
-        console.log("removing og.. "+ editKey.toString())
-        tx.executeSql("delete from employees where id=", [editKey]);
-        tx.executeSql("insert into employees (name, phone, email, avail, skills) values (?, ?, ?, ?, ?)", [nameText, phoneText, emailText, getArrayStr(selectedDays), getArrayStr(selectedSkills)])
-        
-      });
-      setEditKey(-1);
-    }else{
-      setEditKey(-1);
+      if (verifyInputs()){
         setEditState(false);
-      db.transaction((tx)=>{
-        
-        tx.executeSql("insert into employees (name, phone, email, avail, skills) values (?, ?, ?, ?, ?)", [nameText, phoneText, emailText, getArrayStr(selectedDays), getArrayStr(selectedSkills)])
-      });
+        db.transaction((tx)=>{
+          tx.executeSql("delete from employees where id=?", [editKey]);
+          tx.executeSql("insert into employees (name, phone, email, avail, skills) values (?, ?, ?, ?, ?)", [nameText, phoneText, emailText, getArrayStr(selectedDays), getArrayStr(selectedSkills)]);
+        });
+        updateEmployeeArray();
+        setEditKey(-1);
+      }
+      
+    }else{
+        setEditState(false);
+      if (verifyInputs()){
+        db.transaction((tx)=>{
+          tx.executeSql("insert into employees (name, phone, email, avail, skills) values (?, ?, ?, ?, ?)", [nameText, phoneText, emailText, getArrayStr(selectedDays), getArrayStr(selectedSkills)]);
+        });
+        updateEmployeeArray();
+      }
+      
     }
   }
 
@@ -179,7 +182,9 @@ export default function Employees({navigation}) {
     }
 
     if(!err){
-      setEditState(false);
+      return true;
+    }else{
+      return false;
     }
   }
 
@@ -193,6 +198,20 @@ export default function Employees({navigation}) {
     
   }
 
+  const removeEmployee = (ekey, ename) =>{
+    Alert.alert("Confirm", "Are you sure you would like to delete: " + ename + "?",
+    [
+      {text: "Yes", onPress:()=>{
+        db.transaction((tx)=>{
+          tx.executeSql("delete from employees where id=?", [ekey]);
+        });
+        updateEmployeeArray();
+      }},
+      {text: "Cancel"}
+    ])
+    
+  }
+
   function EmployeeButton(props) {
     if (props.ename && props.ekey){
             
@@ -203,7 +222,7 @@ export default function Employees({navigation}) {
             <Text style={{fontSize:25, textAlign:'center'}}>{props.ename}</Text>
           </TouchableOpacity>
           
-          <TouchableOpacity style={{flex:1}} >
+          <TouchableOpacity style={{flex:1}} onPress={()=>{removeEmployee(props.ekey, props.ename)}}>
             <Ionicons name='close-circle-outline' size={35} color={'red'} style={{textAlign:'right'}}></Ionicons>
           </TouchableOpacity>
         </View>
@@ -215,9 +234,8 @@ export default function Employees({navigation}) {
   }
 
   onLoad = async () =>{
-    updateEmployeeArray();
-
     db.transaction((tx) =>{
+
       tx.executeSql("create table if not exists employees (id integer primary key not null, name text, phone text, email text, avail text, skills text);")
     });
     updateEmployeeArray();
@@ -280,7 +298,7 @@ export default function Employees({navigation}) {
         </View>
 
         <Text style={styles.inputLabel}>Skills</Text>
-        <SectionedMultiSelect readOnlyHeadings={true} selectText={"Select Skills"} IconRenderer={Icon} items={skills} uniqueKey="id" subKey="children" onSelectedItemsChange={(d)=>{setSelectedSkills(d); console.log(selectedSkills)} } selectedItems={selectedSkills} ></SectionedMultiSelect>
+        <SectionedMultiSelect readOnlyHeadings={true} selectText={"Select Skills"} IconRenderer={Icon} items={skills} uniqueKey="id" subKey="children" onSelectedItemsChange={(d)=>{setSelectedSkills(d);} } selectedItems={selectedSkills} ></SectionedMultiSelect>
         
         <Text style={styles.inputLabel}>Availability</Text>
         <SectionedMultiSelect readOnlyHeadings={true} selectText={"Select Availability"} IconRenderer={Icon} items={weekdays} uniqueKey="id" subKey="children" onSelectedItemsChange={(d)=>{setSelectedDays(d)}} selectedItems={selectedDays} ></SectionedMultiSelect>
