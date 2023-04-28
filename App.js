@@ -2,7 +2,7 @@ import { StyleSheet} from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import Employees from './screens/Employees';
-import FindEmployees from './screens/FindEmployees';
+import EmployeeFind from './screens/EmployeeFind';
 import EmployeeContact from './screens/EmployeeContact';
 import Ionicons from '@expo/vector-icons/Ionicons'
 import * as SplashScreen from 'expo-splash-screen';
@@ -37,7 +37,7 @@ export default function App({navigation}) {
         tabBarStyle:{padding:10, height:70},
       })}>
         <Tab.Screen name="Employees" component={Employees} ></Tab.Screen>
-        <Tab.Screen name="Search" component={FindEmployees}></Tab.Screen>
+        <Tab.Screen name="Search" component={EmployeeFind}></Tab.Screen>
         <Tab.Screen name="Contact" component={EmployeeContact}></Tab.Screen>
       </Tab.Navigator>
     </NavigationContainer>

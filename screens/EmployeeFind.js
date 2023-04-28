@@ -42,17 +42,15 @@ function openDatabase(){
 }
 const db = openDatabase();
 
-export default function FindEmployees({navigation}) {
+export default function EmployeeFind({navigation}) {
     const [selectedDays, setSelectedDays] = useState([]);
     const [selectedSkills, setSelectedSkills] = useState([]);
     const [employeeArray, setEmployeeArray] = useState();
 
     const updateEmployeeArray = async () => {
-      console.log("updating")
       db.transaction((tx)=>{
         tx.executeSql("select * from employees", [], (tx, res)=>{
           setEmployeeArray( res.rows );
-          console.log(res.rows)
         });
       });
     }
@@ -110,11 +108,7 @@ export default function FindEmployees({navigation}) {
             return (
               <EmployeeButton key={a["id"]} ename={a["name"]} ekey={a["id"].toString()} ></EmployeeButton>
               )
-          }else{
-            console.log(a["skills"])
-            console.log(a["avail"])
           }
-          
         })
         :null
       }
