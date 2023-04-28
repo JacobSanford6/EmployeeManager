@@ -1,8 +1,9 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, ScrollView, Pressable } from 'react-native';
-import { Component, useState } from 'react';
+import { StyleSheet, Text, View, ScrollView, Pressable, TouchableOpacity } from 'react-native';
+import { Component, useState, useEffect } from 'react';
 import SectionedMultiSelect from 'react-native-sectioned-multi-select';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import * as SQLite from 'expo-sqlite';
 
 const statHeight = StatusBar.currentHeight;
 let weekdays = [
@@ -37,9 +38,74 @@ let skills = [
   ]},
 ]
 
-export default function FindEmployees() {
+function openDatabase(){
+  return SQLite.openDatabase("employeeData.db")
+}
+const db = openDatabase();
+
+export default function FindEmployees({navigation}) {
     const [selectedDays, setSelectedDays] = useState([]);
     const [selectedSkills, setSelectedSkills] = useState([]);
+    const [employeeArray, setEmployeeArray] = useState();
+    const [eSelectedDays, setESelectedDays] = useState([]);
+    const [eSelectedSkills, setESelectedSkills] = useState([]);
+
+
+    const updateEmployeeArray = async () => {
+      console.log("updating")
+      db.transaction((tx)=>{
+        tx.executeSql("select * from employees", [], (tx, res)=>{
+          setEmployeeArray( res.rows );
+          console.log(res.rows)
+        });
+      });
+    }
+
+    const getArrayStr = (arr) =>{
+      arr = arr.sort();
+      let nstr = ""
+      arr.map((part)=>{
+        nstr+=part+"|";
+      })
+      nstr.substring(0,nstr.length-1)
+      return nstr;
+    }
+
+    const getSortedArray = (str) => {
+      let narr = [];
+      const split = str.split("|");
+      for (subs of split){
+        if (subs.trim() != ""){
+          narr.push( parseInt(subs));
+        }
+      }
+      return narr.sort();
+    }
+
+    const contactEmployee = (akey) =>{
+      navigation.navigate("Contact", {
+        ekey: akey
+      })
+    }
+
+    function EmployeeButton(props) {
+      if (props.ename && props.ekey){
+        return(
+          <View id={props.ekey} style={styles.ebox}>
+            <TouchableOpacity style={{flex:8}} onPress={() => {contactEmployee(props.ekey)}}>
+              <Text style={{fontSize:25, textAlign:'center'}}>{props.ename}</Text>
+            </TouchableOpacity>
+          </View>
+        )
+      }
+      return(
+        <Text>Please supply props: ename and ekey</Text>
+      )
+    }
+  
+    useEffect(()=> {
+      updateEmployeeArray();
+    },[]);
 
     return (
       <ScrollView style={styles.container2}>
@@ -49,9 +115,19 @@ export default function FindEmployees() {
         <Text style={styles.inputLabel}>Availability</Text>
         <SectionedMultiSelect readOnlyHeadings={true} selectText={"Select Availability"} IconRenderer={Icon} items={weekdays} uniqueKey="id" subKey="children" onSelectedItemsChange={(d)=>{setSelectedDays(d)}} selectedItems={selectedDays} ></SectionedMultiSelect>
 
-        <Pressable>
-          <Text style={styles.findButton}>Find Employees</Text>
-        </Pressable>
+      {employeeArray && employeeArray["_array"] && employeeArray["_array"].length>0?
+        employeeArray["_array"].map(a=>{
+          if (a["skills"] == getArrayStr(selectedSkills).substring(0, a["skills"].length) && getArrayStr(selectedDays).substring(0, a["avail"].length) == a["avail"]){
+            return (
+              <EmployeeButton key={a["id"]} ename={a["name"]} ekey={a["id"].toString()} ></EmployeeButton>
+              )
+          }else{
+            null;
+          }
+          
+        })
+        :null
+      }
       </ScrollView>
   
       
@@ -72,6 +148,16 @@ export default function FindEmployees() {
       paddingRight: '7.5%'
     },
 
+    ebox:{
+      backgroundColor: 'white',
+      width: '90%',
+      alignSelf: 'center',
+      flexDirection: 'row',
+      padding: 10,
+      borderRadius: 100,
+      marginTop: 15,
+    },
+
     findButton:{
       textAlign: 'center',
       backgroundColor: 'limegreen',
@@ -81,7 +167,8 @@ export default function FindEmployees() {
       fontWeight: 'bold',
       width: '50%',
       alignSelf: 'center',
-      marginTop: 30
+      marginTop: 30,
+      marginBottom: 30
     },
 
     inputLabel:{

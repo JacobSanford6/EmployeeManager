@@ -115,6 +115,7 @@ export default function Employees({navigation}) {
   }
 
   const getArrayStr = (arr) =>{
+    arr = arr.sort();
     let nstr = ""
     arr.map((part)=>{
       nstr+=part+"|";
@@ -131,7 +132,7 @@ export default function Employees({navigation}) {
         narr.push( parseInt(subs));
       }
     }
-    return narr;
+    return narr.sort();
   }
 
   const saveEmployee = (ekey) => {
@@ -169,7 +170,7 @@ export default function Employees({navigation}) {
   }
   
   const verifyInputs = () => {
-    let phoneReg = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/;
+    let phoneReg = /^[0-9]{10}$/;
     let emailReg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
     let err = false
     if (!phoneReg.test(phoneText)){
@@ -255,8 +256,6 @@ export default function Employees({navigation}) {
           <Ionicons name="add-circle" size={statHeight+50} color={'green'} style={styles.addButton} onPress={()=>{updateEmployee(-1)}}></Ionicons>
         </TouchableOpacity>
         <ScrollView>
-        <EmployeeButton ename="jake" ekey="1"></EmployeeButton>
-        <EmployeeButton ename="alex" ekey="2"></EmployeeButton>
 
         {employeeArray && employeeArray["_array"]?
         employeeArray["_array"].map(a=>{
