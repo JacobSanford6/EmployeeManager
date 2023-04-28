@@ -1,6 +1,5 @@
-import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, ScrollView, Pressable} from 'react-native';
-import { Component, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import * as SQLite from 'expo-sqlite';
 
@@ -13,8 +12,6 @@ export default function EmployeeContact({route}) {
   let [ename, setename] = useState("None");
   let [ephone, setephone] = useState("None");
   let [eemail, seteemail] = useState("None");
-
-  let employeeArray = []
 
   const getStats = () => {
     db.transaction((tx)=>{
@@ -36,7 +33,6 @@ export default function EmployeeContact({route}) {
     return (
       <ScrollView style={styles.container}>
         <Text style={styles.header}>{ename}</Text>
-
         <View style={styles.inputArea}>
           <Text style={styles.inputLabel}>Phone</Text>
           <Text style={styles.textInput}>{ephone}</Text>
@@ -54,8 +50,6 @@ export default function EmployeeContact({route}) {
           
         </Pressable>
       </ScrollView>
-  
-      
     );
   }
 

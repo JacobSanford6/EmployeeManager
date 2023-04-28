@@ -1,11 +1,8 @@
-import { TextInput, StyleSheet, Text, View, Pressable, StatusBar, ScrollView, TouchableOpacity, PermissionsAndroid, Alert } from 'react-native';
-import { Component, useState, useEffect } from 'react';
-import Constants from 'expo-constants';
-import { StatusBarStyle } from 'expo-status-bar';
-import { StatusBar as StatusBar2} from 'expo-status-bar';
+import { TextInput, StyleSheet, Text, View, StatusBar, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { useState, useEffect } from 'react';
 import SectionedMultiSelect from 'react-native-sectioned-multi-select';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { SafeAreaView, createNavigationContainer } from 'react-navigation';
+import { SafeAreaView } from 'react-navigation';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import * as SQLite from 'expo-sqlite';
 
@@ -25,8 +22,8 @@ let weekdays = [
       {name:"Saturday", id:6},
       {name:"Sunday", id:7},
     ]}
-    
 ]
+
 let skills = [
   {name:"Software", id:1, children:[
     {name:"C#", id:101},
@@ -45,35 +42,7 @@ let skills = [
     {name:"SFX", id:203},
     {name:"Video Scripting", id:204},
   ]},
-
-
 ]
-
-let weekdayIds = {
-  "Monday": 1,
-  "Tuesday": 2,
-  "Wednesday": 3,
-  "Thursday": 4,
-  "Friday": 5,
-  "Saturday": 6,
-  "Sunday": 7,
-}
-
-let skillsIds = {
-  "C#": 101,
-  "Javascript": 102,
-  "C#": 101,
-  "Python":103,
-  "Lua":104,
-  "Java":105,
-  "HTML":106,
-  "CSS":107,
-  "SQL":108,
-  "Camera Work":201,
-  "Editting":202,
-  "SFX":203,
-  "Video Scripting":204,
-}
 
 export default function Employees({navigation}) {
   const [editState, setEditState] = useState(false);
@@ -85,7 +54,6 @@ export default function Employees({navigation}) {
   const [nameText, setNameText] = useState("");
   const [employeeArray, setEmployeeArray] = useState();
   
-
   const editEmployee = (ekey) =>{
     db.transaction((tx)=>{
       tx.executeSql("select * from employees where id = ?;", [ekey], (tx,res)=>{
@@ -93,12 +61,8 @@ export default function Employees({navigation}) {
           setNameText(res.rows._array[0]["name"]);
           setPhoneText(res.rows._array[0]["phone"]);
           setEmailText(res.rows._array[0]["email"]);
-
-
-          
           setSelectedDays(getStrArray(res.rows._array[0]["avail"]));
           setSelectedSkills(getStrArray(res.rows._array[0]["skills"]));
-
         }
       })
     });
@@ -146,7 +110,6 @@ export default function Employees({navigation}) {
         updateEmployeeArray();
         setEditKey(-1);
       }
-      
     }else{
         setEditState(false);
       if (verifyInputs()){
@@ -155,7 +118,6 @@ export default function Employees({navigation}) {
         });
         updateEmployeeArray();
       }
-      
     }
   }
 
@@ -177,6 +139,7 @@ export default function Employees({navigation}) {
       err = true;
       Alert.alert("Error", "Please type a valid phone number.");
     }
+
     if(!emailReg.test(emailText)){
       err = true;
       Alert.alert("Error", "Please type a valid email.");
@@ -190,13 +153,11 @@ export default function Employees({navigation}) {
   }
 
   const updateEmployee = (ekey) => {
-    
       if (ekey != "-1"){
         editEmployee(ekey)
       }else{
         addEmployee();
       }
-    
   }
 
   const removeEmployee = (ekey, ename) =>{
@@ -210,19 +171,15 @@ export default function Employees({navigation}) {
       }},
       {text: "Cancel"}
     ])
-    
   }
 
   function EmployeeButton(props) {
     if (props.ename && props.ekey){
-            
-
       return(
         <View id={props.ekey} style={styles.ebox}>
           <TouchableOpacity style={{flex:8}} onPress={() => {editEmployee(props.ekey)}}>
             <Text style={{fontSize:25, textAlign:'center'}}>{props.ename}</Text>
           </TouchableOpacity>
-          
           <TouchableOpacity style={{flex:1}} onPress={()=>{removeEmployee(props.ekey, props.ename)}}>
             <Ionicons name='close-circle-outline' size={35} color={'red'} style={{textAlign:'right'}}></Ionicons>
           </TouchableOpacity>
@@ -236,7 +193,6 @@ export default function Employees({navigation}) {
 
   onLoad = async () =>{
     db.transaction((tx) =>{
-
       tx.executeSql("create table if not exists employees (id integer primary key not null, name text, phone text, email text, avail text, skills text);")
     });
     updateEmployeeArray();
@@ -248,10 +204,7 @@ export default function Employees({navigation}) {
   
   if (!editState){
     return (
-      
       <SafeAreaView style={styles.container}>
-        
-        
         <TouchableOpacity>
           <Ionicons name="add-circle" size={statHeight+50} color={'green'} style={styles.addButton} onPress={()=>{updateEmployee(-1)}}></Ionicons>
         </TouchableOpacity>
@@ -265,21 +218,17 @@ export default function Employees({navigation}) {
           <EmployeeButton key={a["id"]} ename={a["name"]} ekey={a["id"].toString()} ></EmployeeButton>
           )
         })
-        
-          
         :null
         }
 
         <TouchableOpacity onPress={()=>navigation.navigate("Search")}>
           <Text style={styles.findButton}>Find Employees</Text>
         </TouchableOpacity>
-
         </ScrollView>  
       </SafeAreaView>
     );
   }else{
     return(
-      
       <ScrollView style={styles.container2}>
         <View style={styles.inputArea}>
           <Text style={styles.inputLabel}>Name</Text>

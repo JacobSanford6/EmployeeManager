@@ -5,7 +5,6 @@ import SectionedMultiSelect from 'react-native-sectioned-multi-select';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import * as SQLite from 'expo-sqlite';
 
-const statHeight = StatusBar.currentHeight;
 let weekdays = [
     {name:"Weekdays", id:0, children:[
       {name:"Monday", id:1},
@@ -47,9 +46,6 @@ export default function FindEmployees({navigation}) {
     const [selectedDays, setSelectedDays] = useState([]);
     const [selectedSkills, setSelectedSkills] = useState([]);
     const [employeeArray, setEmployeeArray] = useState();
-    const [eSelectedDays, setESelectedDays] = useState([]);
-    const [eSelectedSkills, setESelectedSkills] = useState([]);
-
 
     const updateEmployeeArray = async () => {
       console.log("updating")
@@ -69,17 +65,6 @@ export default function FindEmployees({navigation}) {
       })
       nstr.substring(0,nstr.length-1)
       return nstr;
-    }
-
-    const getSortedArray = (str) => {
-      let narr = [];
-      const split = str.split("|");
-      for (subs of split){
-        if (subs.trim() != ""){
-          narr.push( parseInt(subs));
-        }
-      }
-      return narr.sort();
     }
 
     const contactEmployee = (akey) =>{
@@ -129,8 +114,6 @@ export default function FindEmployees({navigation}) {
         :null
       }
       </ScrollView>
-  
-      
     );
   }
 
