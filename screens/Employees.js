@@ -173,7 +173,7 @@ export default function Employees({navigation}) {
     ])
   }
 
-  function EmployeeButton(props) {
+  const EmployeeButton = (props) => {
     if (props.ename && props.ekey){
       return(
         <View id={props.ekey} style={styles.ebox}>

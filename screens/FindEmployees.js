@@ -73,7 +73,7 @@ export default function FindEmployees({navigation}) {
       })
     }
 
-    function EmployeeButton(props) {
+    const EmployeeButton = (props)=> {
       if (props.ename && props.ekey){
         return(
           <View id={props.ekey} style={styles.ebox}>
@@ -102,12 +102,17 @@ export default function FindEmployees({navigation}) {
 
       {employeeArray && employeeArray["_array"] && employeeArray["_array"].length>0?
         employeeArray["_array"].map(a=>{
-          if (a["skills"] == getArrayStr(selectedSkills).substring(0, a["skills"].length) && getArrayStr(selectedDays).substring(0, a["avail"].length) == a["avail"]){
+          if ( a["skills"] == getArrayStr(selectedSkills).substring(0, a["skills"].length) && getArrayStr(selectedDays).substring(0, a["avail"].length) == a["avail"])  {
+            return (
+              <EmployeeButton key={a["id"]} ename={a["name"]} ekey={a["id"].toString()} ></EmployeeButton>
+              )
+          }else if (selectedDays.length==0 && selectedSkills.length==0){
             return (
               <EmployeeButton key={a["id"]} ename={a["name"]} ekey={a["id"].toString()} ></EmployeeButton>
               )
           }else{
-            null;
+            console.log(a["skills"])
+            console.log(a["avail"])
           }
           
         })

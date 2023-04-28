@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, ScrollView, Pressable} from 'react-native';
+import { StyleSheet, Text, View, ScrollView, Pressable, Linking} from 'react-native';
 import { useEffect, useState } from 'react';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import * as SQLite from 'expo-sqlite';
@@ -37,7 +37,9 @@ export default function EmployeeContact({route}) {
           <Text style={styles.inputLabel}>Phone</Text>
           <Text style={styles.textInput}>{ephone}</Text>
         </View>
-        <Pressable>
+        <Pressable onPress={()=>{
+          Linking.openURL(`tel:${ephone}`)
+        }}>
           <Icon name='phone' style={styles.findButton} size={25}></Icon>
         </Pressable>
 
@@ -45,7 +47,9 @@ export default function EmployeeContact({route}) {
           <Text style={styles.inputLabel}>Email</Text>
           <Text style={styles.textInput}>{eemail}</Text>
         </View>
-        <Pressable>
+        <Pressable onPress={()=>{
+          Linking.openURL(`mailto:${eemail}`)
+        }}>
         <Icon name='mail' style={styles.findButton} size={25}></Icon>
           
         </Pressable>
