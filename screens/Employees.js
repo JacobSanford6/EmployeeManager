@@ -260,11 +260,7 @@ export default function Employees({navigation}) {
       </ScrollView>
     );
   }
-    
-  
   }
-
-  
 
   const styles = StyleSheet.create({
     addButton:{
