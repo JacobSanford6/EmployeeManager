@@ -57,11 +57,14 @@ export default function EmployeeFind({navigation}) {
 
     const getArrayStr = (arr) =>{
       arr = arr.sort();
-      let nstr = ""
+      let nstr = "";
+
       arr.map((part)=>{
         nstr+=part+"|";
-      })
-      nstr.substring(0,nstr.length-1)
+      });
+
+      nstr.substring(0,nstr.length-1);
+
       return nstr;
     }
 
@@ -69,11 +72,13 @@ export default function EmployeeFind({navigation}) {
       let splitSearch = searchedStr.split("|");
       let querySearch = queryStr.split("|");
       let success = true;
+
       querySearch.map(pt=>{
         if (pt!="" && splitSearch.indexOf(pt)==-1){
           success=false;
         }
       })
+
       return success
     }
 

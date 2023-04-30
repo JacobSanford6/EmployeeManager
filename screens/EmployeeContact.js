@@ -17,6 +17,7 @@ export default function EmployeeContact({route}) {
     db.transaction((tx)=>{
       tx.executeSql("select * from employees where id=?", [route.params["ekey"]], (tx, res)=>{
         let row = res.rows["_array"][0]
+
         setename(row["name"])
         setephone(row["phone"])
         seteemail(row["email"])
@@ -62,7 +63,6 @@ export default function EmployeeContact({route}) {
       flex: 1,
       paddingLeft: '7.5%',
       paddingRight: '7.5%'
-      
     },
 
     header: {

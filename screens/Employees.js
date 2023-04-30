@@ -80,22 +80,27 @@ export default function Employees({navigation}) {
 
   const getArrayStr = (arr) =>{
     arr = arr.sort();
-    let nstr = ""
+    let nstr = "";
+
     arr.map((part)=>{
       nstr+=part+"|";
-    })
+    });
+
     nstr.substring(0,nstr.length-1)
+
     return nstr;
   }
 
   const getStrArray = (str) => {
     let narr = [];
     const split = str.split("|");
+
     for (subs of split){
       if (subs.trim() != ""){
         narr.push( parseInt(subs));
       }
     }
+
     return narr.sort();
   }
 
@@ -134,7 +139,8 @@ export default function Employees({navigation}) {
   const verifyInputs = () => {
     let phoneReg = /^[0-9]{10}$/;
     let emailReg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-    let err = false
+    let err = false;
+    
     if (!phoneReg.test(phoneText)){
       err = true;
       Alert.alert("Error", "Please type a valid phone number.");
