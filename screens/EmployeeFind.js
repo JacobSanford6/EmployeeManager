@@ -65,6 +65,20 @@ export default function EmployeeFind({navigation}) {
       return nstr;
     }
 
+    const compareArrayStrs = (searchedStr, queryStr) =>{
+      let splitSearch = searchedStr.split("|");
+      let querySearch = queryStr.split("|");
+      let success = true;
+
+      querySearch.map(pt=>{
+        if (pt!="" && splitSearch.indexOf(pt)==-1){
+          success=false;
+        }
+      })
+
+      return success
+    }
+
     const contactEmployee = (akey) =>{
       navigation.navigate("Contact", {
         ekey: akey
@@ -93,14 +107,14 @@ export default function EmployeeFind({navigation}) {
     return (
       <ScrollView style={styles.container2}>
         <Text style={styles.inputLabel}>Skills</Text>
-        <SectionedMultiSelect readOnlyHeadings={true} selectText={"Select Skills"} IconRenderer={Icon} items={skills} uniqueKey="id" subKey="children" onSelectedItemsChange={(d)=>{setSelectedSkills(d)}} selectedItems={selectedSkills} ></SectionedMultiSelect>
+        <SectionedMultiSelect readOnlyHeadings={true} selectText={"Select Skills"} IconRenderer={Icon} items={skills} uniqueKey="id" subKey="children" onSelectedItemsChange={(d)=>{setSelectedSkills(d); updateEmployeeArray()}} selectedItems={selectedSkills} ></SectionedMultiSelect>
 
         <Text style={styles.inputLabel}>Availability</Text>
-        <SectionedMultiSelect readOnlyHeadings={true} selectText={"Select Availability"} IconRenderer={Icon} items={weekdays} uniqueKey="id" subKey="children" onSelectedItemsChange={(d)=>{setSelectedDays(d)}} selectedItems={selectedDays} ></SectionedMultiSelect>
+        <SectionedMultiSelect readOnlyHeadings={true} selectText={"Select Availability"} IconRenderer={Icon} items={weekdays} uniqueKey="id" subKey="children" onSelectedItemsChange={(d)=>{setSelectedDays(d); updateEmployeeArray()}} selectedItems={selectedDays} ></SectionedMultiSelect>
 
       {employeeArray && employeeArray["_array"] && employeeArray["_array"].length>0?
         employeeArray["_array"].map(a=>{
-          if ( a["skills"] == getArrayStr(selectedSkills).substring(0, a["skills"].length) && getArrayStr(selectedDays).substring(0, a["avail"].length) == a["avail"])  {
+          if ( compareArrayStrs(a["avail"], getArrayStr(selectedDays)) && compareArrayStrs(a["skills"], getArrayStr(selectedSkills)) )  {
             return (
               <EmployeeButton key={a["id"]} ename={a["name"]} ekey={a["id"].toString()} ></EmployeeButton>
               )
