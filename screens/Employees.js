@@ -116,8 +116,8 @@ export default function Employees({navigation}) {
         setEditKey(-1);
       }
     }else{
-        setEditState(false);
       if (verifyInputs()){
+        setEditState(false);
         db.transaction((tx)=>{
           tx.executeSql("insert into employees (name, phone, email, avail, skills) values (?, ?, ?, ?, ?)", [nameText, phoneText, emailText, getArrayStr(selectedDays), getArrayStr(selectedSkills)]);
         });
