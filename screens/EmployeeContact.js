@@ -76,6 +76,7 @@ export default function EmployeeContact({route}) {
       marginBottom: 5,
       height: 85,
       marginTop: 15,
+      marginBottom: 30
     },
 
     findButton:{
@@ -86,7 +87,6 @@ export default function EmployeeContact({route}) {
       fontWeight: 'bold',
       width: '50%',
       alignSelf: 'center',
-      marginTop: 30
     },
 
     textInput: {

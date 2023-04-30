@@ -69,13 +69,11 @@ export default function EmployeeFind({navigation}) {
       let splitSearch = searchedStr.split("|");
       let querySearch = queryStr.split("|");
       let success = true;
-
       querySearch.map(pt=>{
         if (pt!="" && splitSearch.indexOf(pt)==-1){
           success=false;
         }
       })
-
       return success
     }
 
